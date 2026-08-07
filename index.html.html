@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[ضع اسمك هنا] — أنظمة إكسل و VBA للمحلات والشركات الصغيرة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ledger-green-deep:#0e3d2f;
+    --ledger-green:#134c3a;
+    --paper:#efe8d3;
+    --paper-light:#f7f2e4;
+    --ink:#1c2a2e;
+    --brass:#b8863b;
+    --brass-light:#d9ac5f;
+    --red-ink:#9c3b32;
+    --line:#c9bd97;
+    --shadow: 0 12px 30px rgba(14,61,47,0.18);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Cairo', sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    opacity:0.18;
+  }
+  a{color:inherit;}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+
+  header.site{
+    position:sticky; top:0; z-index:50;
+    background:rgba(239,232,211,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 0;
+  }
+  .brandmark{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;}
+  .brandmark .cell{
+    width:26px;height:26px;border:2px solid var(--ledger-green);
+    display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;
+    font-size:0.7rem;color:var(--ledger-green);background:var(--paper-light);
+  }
+  nav.links{display:flex;gap:26px;font-weight:600;font-size:0.95rem;}
+  nav.links a{text-decoration:none;position:relative;padding:4px 0;}
+  nav.links a::after{
+    content:"";position:absolute;right:0;bottom:0;width:0;height:2px;
+    background:var(--brass);transition:width .25s ease;
+  }
+  nav.links a:hover::after{width:100%;}
+
+  .hero{padding:72px 0 56px;}
+  .formula-bar{
+    display:flex;align-items:center;gap:0;
+    background:var(--paper-light);
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    max-width:560px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.85rem;
+    margin-bottom:34px;
+  }
+  .formula-bar .cellref{
+    background:var(--ledger-green);color:var(--paper-light);
+    padding:9px 16px;font-weight:600;flex-shrink:0;
+  }
+  .formula-bar .fx{padding:9px 10px;color:var(--brass);border-inline-end:1px solid var(--line);font-weight:700;}
+  .formula-bar .formula-text{padding:9px 14px;white-space:nowrap;overflow:hidden;color:var(--ink);}
+  .formula-bar .caret{display:inline-block;width:7px;height:1em;background:var(--red-ink);vertical-align:text-bottom;animation:blink 1s steps(1) infinite;margin-inline-start:2px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  h1.headline{
+    font-family:'Aref Ruqaa', serif;
+    font-weight:700;
+    font-size:clamp(2.1rem, 5vw, 3.4rem);
+    color:var(--ledger-green-deep);
+    margin:0 0 18px;
+    max-width:780px;
+  }
+  p.sub{
+    font-size:1.08rem;
+    max-width:600px;
+    color:#3a4a44;
+    margin:0 0 30px;
+  }
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:13px 26px;border-radius:4px;
+    font-weight:700;font-size:0.95rem;
+    text-decoration:none;border:2px solid transparent;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn.primary{background:var(--ledger-green);color:var(--paper-light);box-shadow:var(--shadow);}
+  .btn.ghost{border-color:var(--ledger-green); color:var(--ledger-green-deep);}
+
+  section{padding:64px 0;position:relative;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem;letter-spacing:.06em;
+    color:var(--brass);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h2.section-title{
+    font-family:'Aref Ruqaa', serif;
+    font-size:2rem;color:var(--ledger-green-deep);margin:0 0 36px;
+  }
+
+  .ledger{
+    border-top:2px solid var(--ledger-green);
+    border-bottom:2px solid var(--ledger-green);
+  }
+  .ledger-row{
+    display:flex;align-items:center;gap:20px;
+    padding:20px 4px;
+    border-bottom:1px dashed var(--line);
+  }
+  .ledger-row:last-child{border-bottom:none;}
+  .ledger-row .glyph{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.85rem;color:var(--brass);
+    width:64px;flex-shrink:0;
+    border-inline-end:1px solid var(--line);
+    padding-inline-end:16px;
+  }
+  .ledger-row .txt h3{margin:0 0 4px;font-size:1.08rem;color:var(--ink);}
+  .ledger-row .txt p{margin:0;color:#54635d;font-size:0.94rem;}
+  .ledger-row{transition:background .2s ease;}
+  .ledger-row:hover{background:rgba(184,134,59,0.08);}
+
+  .invoice-card{
+    background:var(--paper-light);
+    border:1px solid var(--line);
+    border-radius:8px;
+    box-shadow:var(--shadow);
+    padding:36px;
+    position:relative;
+    overflow:hidden;
+  }
+  .invoice-card::before{
+    content:"";position:absolute;inset:10px;
+    border:1px dashed var(--line);
+    border-radius:4px;pointer-events:none;
+  }
+  .invoice-head{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    border-bottom:2px solid var(--ledger-green);
+    padding-bottom:16px;margin-bottom:20px;
+    flex-wrap:wrap;gap:12px;
+  }
+  .invoice-head h3{
+    font-family:'Aref Ruqaa', serif;font-size:1.6rem;
+    color:var(--ledger-green-deep);margin:0;
+  }
+  .invoice-head span.tag{
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    color:#54635d;
+  }
+  .module-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:14px;margin:22px 0 26px;
+  }
+  .module{
+    border:1px solid var(--line);border-radius:6px;
+    padding:14px 16px;background:var(--paper);
+  }
+  .module .name{font-weight:700;color:var(--ledger-green-deep);margin-bottom:4px;}
+  .module .desc{font-size:0.86rem;color:#54635d;}
+
+  .stamp{
+    position:absolute;
+    left:36px; bottom:34px;
+    width:112px;height:112px;
+    border:3px solid var(--red-ink);
+    border-radius:50%;
+    display:grid;place-items:center;
+    text-align:center;
+    color:var(--red-ink);
+    font-family:'Aref Ruqaa', serif;
+    font-weight:700;font-size:0.95rem;
+    transform:rotate(-14deg) scale(0.8);
+    opacity:0;
+    transition:opacity .6s ease, transform .6s cubic-bezier(.34,1.56,.64,1);
+    line-height:1.3;
+    background:rgba(156,59,50,0.03);
+  }
+  .stamp.show{opacity:0.88;transform:rotate(-14deg) scale(1);}
+  .stamp span{display:block;}
+  .stamp .small{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;font-weight:500;letter-spacing:.05em;}
+
+  .findings{margin-top:18px;}
+  .findings h4{
+    font-size:0.9rem;color:var(--brass);
+    font-family:'IBM Plex Mono',monospace;font-weight:600;
+    margin-bottom:10px;
+  }
+  .findings ul{margin:0;padding-inline-start:20px;color:#3a4a44;font-size:0.92rem;}
+  .findings li{margin-bottom:6px;}
+
+  .contact-card{
+    background:var(--paper-light);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:40px;
+    box-shadow:var(--shadow);
+  }
+  .sig-line{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;
+    margin-top:28px;padding-top:24px;border-top:1px dashed var(--line);
+  }
+  .sig-field{min-width:200px;}
+  .sig-field .label{
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    color:var(--brass);margin-bottom:6px;
+  }
+  .sig-field .value{font-weight:700;font-size:1.02rem;color:var(--ink);}
+  .sig-field .value.placeholder{color:#8a8060;font-style:italic;font-weight:600;}
+
+  footer{
+    text-align:center;padding:30px 0 44px;
+    color:#6a7770;font-size:0.85rem;
+  }
+
+  @media (max-width:640px){
+    nav.links{gap:16px;font-size:0.85rem;}
+    .invoice-card{padding:24px;}
+    .stamp{width:92px;height:92px;font-size:0.8rem;left:20px;bottom:20px;}
+    .contact-card{padding:26px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <div class="brandmark"><span class="cell">A1</span> [ضع اسمك هنا]</div>
+    <nav class="links">
+      <a href="#projects">المشاريع</a>
+      <a href="#services">الخدمات</a>
+      <a href="#contact">تواصل</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="formula-bar">
+      <span class="cellref">I3</span>
+      <span class="fx">fx</span>
+      <span class="formula-text" id="typedFormula"></span><span class="caret"></span>
+    </div>
+    <h1 class="headline">أبني لمحلك نظام إكسل يمسك مبيعاتك ومخزونك من غير ما يقع في نص الشهر</h1>
+    <p class="sub">أنظمة إكسل وVBA مصممة خصيصًا للمحلات والشركات الصغيرة: مبيعات، مشتريات، مخزون، وفواتير قابلة للطباعة — كل حاجة في ملف واحد بتشتغل صح.</p>
+    <div class="cta-row">
+      <a href="#projects" class="btn primary">شوف نموذج شغل</a>
+      <a href="#contact" class="btn ghost">اطلب نظام لمحلك</a>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="eyebrow">الخدمات</div>
+    <h2 class="section-title">إيه اللي بعمله بالظبط</h2>
+    <div class="ledger">
+      <div class="ledger-row">
+        <div class="glyph">=SUMIF</div>
+        <div class="txt">
+          <h3>أنظمة مبيعات ومشتريات ومخزون</h3>
+          <p>الأرقام بتتحسب لوحدها ومربوطة ببعض صح، مش شيتات منفصلة كل واحدة في عالم لوحدها.</p>
+        </div>
+      </div>
+      <div class="ledger-row">
+        <div class="glyph">🖶</div>
+        <div class="txt">
+          <h3>فواتير جاهزة للطباعة</h3>
+          <p>شكل فاتورة احترافي، بيتاخد نسخة أرشيف تلقائي من غير ما تكتب حاجة مرتين.</p>
+        </div>
+      </div>
+      <div class="ledger-row">
+        <div class="glyph">VBA</div>
+        <div class="txt">
+          <h3>أتمتة بالماكرو</h3>
+          <p>زرار واحد يحفظ، يطبع، يمسح الفورم — من غير أي خطوات يدوية معقدة.</p>
+        </div>
+      </div>
+      <div class="ledger-row">
+        <div class="glyph">راجعة</div>
+        <div class="txt">
+          <h3>مراجعة ملفات موجودة</h3>
+          <p>عندك ملف إكسل قديم فيه أخطاء أو بطيء؟ أراجعه وأقولك المشكلة بالظبط قبل ما نصلحها.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <div class="eyebrow">نموذج شغل</div>
+    <h2 class="section-title">نظام مبيعات ومخزون وفواتير</h2>
+
+    <div class="invoice-card" id="invoiceCard">
+      <div class="invoice-head">
+        <h3>فاتورة / نظام تجاري متكامل</h3>
+        <span class="tag">ملف Excel واحد (.xlsm) — بماكروهات VBA</span>
+      </div>
+
+      <p style="max-width:640px;color:#3a4a44;">
+        نظام مكون من سبع شيتات مترابطة لإدارة محل صغير: واجهة رئيسية، مبيعات، مشتريات،
+        مخزون، فواتير، وأرشيف تلقائي للمبيعات والمشتريات.
+      </p>
+
+      <div class="module-grid">
+        <div class="module"><div class="name">المبيعات</div><div class="desc">جدول Excel مربوط بمعادلة تحسب الإجمالي تلقائيًا بعد الخصم</div></div>
+        <div class="module"><div class="name">المشتريات</div><div class="desc">تسجيل فواتير الموردين وربطها بالكمية والسعر</div></div>
+        <div class="module"><div class="name">المخزون</div><div class="desc">حساب الكمية المتاحة من فرق المشتريات والمبيعات</div></div>
+        <div class="module"><div class="name">الفواتير والأرشيف</div><div class="desc">طباعة الفاتورة وحفظ نسخة أرشيف تلقائيًا بماكرو</div></div>
+      </div>
+
+      <div class="findings">
+        <h4>ملاحظات من المراجعة</h4>
+        <ul>
+          <li>معادلة ربط المخزون بالكود محتاجة تتصلح (SUMIF بدل طرح الأعمدة مباشرة)</li>
+          <li>تحويل التواريخ من نص إلى تاريخ Excel فعلي لتفعيل الفرز والتقارير</li>
+          <li>إلغاء الإدخال المزدوج بربط شيت المخزون تلقائيًا بالمبيعات والمشتريات</li>
+        </ul>
+      </div>
+
+      <div class="stamp" id="stampEl">
+        <span>تمت</span><span>المراجعة</span><span class="small">SAMPLE · نموذج</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="eyebrow">تواصل</div>
+    <h2 class="section-title">عايز نظام لمحلك؟</h2>
+    <div class="contact-card">
+      <p style="margin:0 0 8px;color:#3a4a44;max-width:560px;">
+        ابعتلي تفاصيل محلك أو شركتك (نوع النشاط، عدد الأصناف، شكل الفواتير اللي محتاجها)
+        وهرجعلك بعرض واضح وميعاد تسليم.
+      </p>
+      <div class="sig-row">
+        <a href="#" class="btn primary" style="margin-top:18px;">راسلني</a>
+      </div>
+      <div class="sig-line">
+        <div class="sig-field">
+          <div class="label">الاسم</div>
+          <div class="value placeholder">[ضع اسمك هنا]</div>
+        </div>
+        <div class="sig-field">
+          <div class="label">واتساب / موبايل</div>
+          <div class="value placeholder">[رقمك هنا]</div>
+        </div>
+        <div class="sig-field">
+          <div class="label">إيميل</div>
+          <div class="value placeholder">[بريدك الإلكتروني هنا]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© <span id="year"></span> [ضع اسمك هنا] — أنظمة إكسل وVBA للمحلات والشركات الصغيرة</div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const formula = '=نظام("مبيعات"،"مشتريات"،"مخزون"،"فواتير")';
+  const el = document.getElementById('typedFormula');
+  let i = 0;
+  function type(){
+    if(i <= formula.length){
+      el.textContent = formula.slice(0, i);
+      i++;
+      setTimeout(type, 55);
+    }
+  }
+  type();
+
+  const stamp = document.getElementById('stampEl');
+  const card = document.getElementById('invoiceCard');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ stamp.classList.add('show'); }
+    });
+  }, {threshold:0.4});
+  io.observe(card);
+</script>
+
+</body>
+</html>
